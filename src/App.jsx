@@ -1,34 +1,55 @@
-import React, { use, useState } from 'react'
+import React, { useState } from 'react'
 import './App.css'
 function App() {
   // const [ActiveButton, SetActiveButton] = useState('')
   const [name, setname] = useState('')
   const [priority, setpriority] = useState('')
-  const [user, setuser] = useState(JSON.parse(localStorage.getItem('todo')))
+  const [user, setuser] = useState(JSON.parse(localStorage.getItem('todo')) || [])
   const [edit, setedit] = useState(null)
+  // const [isChecked, setIsChecked] = useState(false);
+  // const [allcheak, setallcheak] = useState(false)
+  const [remo, setremo] = useState([])
+  const setalldelet = (val) => {
+
+    setremo([...remo, val])
+
+  }
+  const setall = () => {
+    const removeall = user.filter((val) => !remo.some((item) => item.id === val.id));
+    setuser(removeall)
+    localStorage.setItem('todo', JSON.stringify(removeall))
+    console.log(removeall);
+
+  }
+  console.log(remo);
+  const setalldelet2 = () => {
+    localStorage.removeItem('todo');
+    setuser([]);  
+    console.log('All data deleted successfully!');
+};
 
   const haendle = (e) => {
     e.preventDefault()
 
-    // const obj={
-    //   name,priority
-    // }
-    // const u=[...user,obj]
-    // setuser(u)
-    setuser(pre => ([...pre, { name, priority, status: true, id: Math.floor(Math.random() * 100) }]))
 
-    if(edit!=null) {
+    if (name == '' && priority == '') {
+      alert('Enter the input fild')
+    } else {
+      setuser(pre => ([...pre, { name, priority, status: true, id: Math.floor(Math.random() * 100) }]))
 
-      let updatedData = user.map((val)=>{
+    }
+    if (edit != null) {
 
-        if(val.id==edit.id) {
+      let updatedData = user.map((val) => {
+
+        if (val.id == edit.id) {
 
           val.name = name
           val.priority = priority
-          
+
         }
 
-        return(val)
+        return (val)
 
       })
 
@@ -40,7 +61,7 @@ function App() {
     setname('')
     setpriority('')
   }
-  console.log(user);
+  // console.log(user);
 
   localStorage.setItem('todo', JSON.stringify(user))
 
@@ -61,23 +82,6 @@ function App() {
     setuser(del)
 
   }
-
-  // if (edit) {
-  //   let up = user.map((val) => {
-  //     if (val.id == edit) {
-  //       val.name = name
-  //       val.priority=priority
-  //     }
-  //     return val;
-  //   })
-
-  //   localStorage.setItem('todo', JSON.stringify(up));
-  //   setuser(up);
-  //   // alert("record edit")
-  //   // setedit("")
-  //   // setlist("")
-  // }
-
   const add = (id) => {
 
     const single = user.find(val => val.id == id)
@@ -87,11 +91,11 @@ function App() {
     setpriority(single.priority)
 
   }
-
   return (
     <>
-
-
+    <div className="button-group"> <button className='selectdelet' onClick={() => setall()}><i class="fa-solid fa-trash" style={{colo: '#f4f5f6'}}></i>Select</button>
+    <button className='selectdelet' onClick={() => setalldelet2()}><i class="fa-solid fa-trash" style={{colo: '#f4f5f6'}}></i>Delet All</button></div>
+    
       <div className="main-div">
         <div className="input-fild">
           <form onSubmit={haendle}>
@@ -103,8 +107,10 @@ function App() {
                 (<button className='button' type='submit'>submit</button>)
             }
           </form>
-
         </div>
+        {/* <input checked={isChecked}
+          onChange={() => setIsChecked(!isChecked)} type="checkbox" /> */}
+
 
         {
           user.map((val) => {
@@ -125,7 +131,8 @@ function App() {
                   <button onClick={() => toggle(val?.id, val?.status)}>{val.status === true ? 'active' : 'dactive'}</button>
                 </div>
                 <div className="cheakbox">
-                  <input type="checkbox" />
+                  <input onClick={() => setalldelet(val)} type="checkbox" />
+
                 </div>
                 <div onClick={() => add(val?.id)} className="add"><i class="fa-solid fa-pen-to-square"></i></div>
                 <div onClick={() => delet(val?.id)} className="delet"><i class="fa-solid fa-trash"></i></div>
@@ -139,6 +146,7 @@ function App() {
 
 
       </div>
+     
     </>
   )
 }
